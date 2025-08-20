@@ -1,95 +1,68 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../providers/AuthProvider";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabase";
 
-/** หน้าเข้าสู่ระบบ */
-export default function LoginPage() {
+export default function Login() {
   const nav = useNavigate();
-  const { signIn } = useAuth();
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState<boolean>(false);
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function onLogin(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
-    setError(null);
-
+    setMsg(null); setLoading(true);
     try {
-      const res: any = await signIn(email.trim(), password);
-
-      if (res?.error) {
-        setError(res.error.message ?? "เข้าสู่ระบบไม่สำเร็จ");
-        return;
-      }
-      nav("/");
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+      if (error) throw error;
+      // ล็อกอินสำเร็จ → ไปหน้าแอดมินเลย
+      nav("/admin", { replace: true });
     } catch (err: any) {
-      setError(err?.message ?? "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
+      setMsg(err.message ?? "เข้าสู่ระบบไม่สำเร็จ");
     } finally {
-      setBusy(false);
+      setLoading(false);
     }
   }
 
-  return (
-    <div style={{ maxWidth: 420, margin: "56px auto", padding: 24 }}>
-      <h1 style={{ marginBottom: 12 }}>เข้าสู่ระบบ</h1>
+  async function onLogout() {
+    await supabase.auth.signOut();
+    setMsg("ออกจากระบบแล้ว");
+  }
 
-      <form onSubmit={onSubmit}>
-        <label htmlFor="email">อีเมล</label>
+  return (
+    <div className="p-6 max-w-sm mx-auto">
+      <h1 className="text-xl font-bold mb-4">เข้าสู่ระบบ</h1>
+      <form className="space-y-3" onSubmit={onLogin}>
         <input
-          id="email"
           type="email"
+          required
+          placeholder="admin@example.com"
+          className="w-full border rounded px-3 py-2"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
-          style={inputStyle}
         />
-
-        <label htmlFor="password" style={{ marginTop: 8 }}>
-          รหัสผ่าน
-        </label>
         <input
-          id="password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
           required
-          style={inputStyle}
+          placeholder="••••••••"
+          className="w-full border rounded px-3 py-2"
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
         />
-
-        {error && <div style={{ color: "#e11d48", marginTop: 8 }}>{error}</div>}
-
-        <button type="submit" disabled={busy} style={buttonStyle}>
-          {busy ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full rounded px-3 py-2 bg-black text-white disabled:opacity-50"
+        >
+          {loading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
         </button>
       </form>
 
-      <div style={{ marginTop: 12, textAlign: "center" }}>
-        ยังไม่มีบัญชี? <Link to="/register">สมัครสมาชิก</Link>
-      </div>
+      <button className="mt-3 text-sm underline" onClick={onLogout}>
+        ออกจากระบบ
+      </button>
+
+      {msg && <p className="text-sm mt-2">{msg}</p>}
     </div>
   );
 }
-
-const inputStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  padding: 10,
-  borderRadius: 8,
-  border: "1px solid #e5e7eb",
-  marginTop: 4,
-};
-
-const buttonStyle: React.CSSProperties = {
-  width: "100%",
-  marginTop: 12,
-  padding: "10px 12px",
-  background: "#2563eb",
-  color: "white",
-  border: "none",
-  borderRadius: 10,
-  cursor: "pointer",
-};
-
