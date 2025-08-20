@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 
-/**
- * หน้าสมัครสมาชิก
- */
+/** หน้าสมัครสมาชิก */
 export default function RegisterPage() {
   const { signUp } = useAuth();
 
@@ -14,7 +11,7 @@ export default function RegisterPage() {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState<boolean>(false);
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setMsg(null);
@@ -26,8 +23,6 @@ export default function RegisterPage() {
         setMsg(res.error.message ?? "สมัครสมาชิกไม่สำเร็จ");
         return;
       }
-
-      // เผื่อบางระบบต้องยืนยันอีเมล
       if (res?.needsEmailConfirm) {
         setMsg("สมัครสำเร็จ กรุณายืนยันอีเมลก่อนเข้าสู่ระบบ");
       } else {
@@ -110,3 +105,4 @@ const buttonStyle: React.CSSProperties = {
   cursor: "pointer",
   userSelect: "none",
 };
+

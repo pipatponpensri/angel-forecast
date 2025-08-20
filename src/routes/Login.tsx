@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import type { FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthProvider";
 
-/**
- * หน้าเข้าสู่ระบบ
- */
+/** หน้าเข้าสู่ระบบ */
 export default function LoginPage() {
   const nav = useNavigate();
   const { signIn } = useAuth();
@@ -15,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<boolean>(false);
 
-  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setBusy(true);
     setError(null);
@@ -23,13 +20,10 @@ export default function LoginPage() {
     try {
       const res: any = await signIn(email.trim(), password);
 
-      // กรณี lib คืนรูปแบบ { error?: { message: string } }
       if (res?.error) {
         setError(res.error.message ?? "เข้าสู่ระบบไม่สำเร็จ");
         return;
       }
-
-      // สำเร็จ → ไปหน้าแรก
       nav("/");
     } catch (err: any) {
       setError(err?.message ?? "เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
@@ -65,9 +59,7 @@ export default function LoginPage() {
           style={inputStyle}
         />
 
-        {error && (
-          <div style={{ color: "#e11d48", marginTop: 8 }}>{error}</div>
-        )}
+        {error && <div style={{ color: "#e11d48", marginTop: 8 }}>{error}</div>}
 
         <button type="submit" disabled={busy} style={buttonStyle}>
           {busy ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบ"}
@@ -100,3 +92,4 @@ const buttonStyle: React.CSSProperties = {
   borderRadius: 10,
   cursor: "pointer",
 };
+
