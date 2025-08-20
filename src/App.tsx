@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import RequireApproved from "@/routes/RequireApproved";
-import Home from "@/pages/Home";
-import Pending from "@/pages/Pending";
-import Expired from "@/pages/Expired";
+import RequireApproved from "./routes/RequireApproved";
+import Home from "./pages/Home";
+import Pending from "./pages/Pending";
+import Expired from "./pages/Expired";
 
 export default function App() {
   return (

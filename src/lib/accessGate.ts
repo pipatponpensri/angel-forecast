@@ -1,4 +1,4 @@
-import { supabase } from "@/supabase";
+import { supabase } from "../supabase";
 
 export type AccessCheck =
   | { ok: true }
@@ -9,12 +9,10 @@ export async function checkAccess(): Promise<AccessCheck> {
   if (sErr) return { ok: false, reason: "ERROR", message: sErr.message };
   if (!session) return { ok: false, reason: "NO_SESSION" };
 
-  const uid = session.user.id;
-
   const { data, error } = await supabase
     .from("user_access")
     .select("is_approved, expires_at")
-    .eq("user_id", uid)
+    .eq("user_id", session.user.id)
     .single();
 
   if (error) return { ok: false, reason: "ERROR", message: error.message };
@@ -25,6 +23,5 @@ export async function checkAccess(): Promise<AccessCheck> {
 
   if (!approved) return { ok: false, reason: "PENDING" };
   if (!notExpired) return { ok: false, reason: "EXPIRED" };
-
   return { ok: true };
 }
