@@ -1,29 +1,26 @@
-import { Route, Routes, Navigate } from "react-router-dom";
-import Protected from "./components/Protected";
-import { AdminOnly } from "./components/RoleGate";
-import LoginPage from "./routes/Login";
-import RegisterPage from "./routes/Register";
-import DashboardPage from "./routes/Dashboard";
-import AdminPage from "./routes/Admin";
+// App.tsx (ตัวอย่าง)
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import RequireApproved from "@/routes/RequireApproved";
+import Home from "@/pages/Home";
+import Pending from "@/pages/Pending";
+import Expired from "@/pages/Expired";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/pending" element={<Pending />} />
+        <Route path="/expired" element={<Expired />} />
 
-      {/* เส้นทางที่ต้องล็อกอิน */}
-      <Route element={<Protected />}>
-        <Route index element={<DashboardPage />} />
-
-        {/* เฉพาะแอดมิน */}
-        <Route element={<AdminOnly />}>
-          <Route path="/admin" element={<AdminPage />} />
-        </Route>
-      </Route>
-
-      {/* fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <Route
+          path="/"
+          element={
+            <RequireApproved>
+              <Home />
+            </RequireApproved>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
