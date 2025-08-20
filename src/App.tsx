@@ -1,4 +1,3 @@
-// App.tsx (ตัวอย่าง)
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RequireApproved from "@/routes/RequireApproved";
 import Home from "@/pages/Home";
@@ -11,7 +10,6 @@ export default function App() {
       <Routes>
         <Route path="/pending" element={<Pending />} />
         <Route path="/expired" element={<Expired />} />
-
         <Route
           path="/"
           element={
